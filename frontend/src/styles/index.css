@@ -127,3 +127,164 @@ th { background: #f8fafc; font-weight: 600; }
 .info-text { color: var(--primary); font-size: 0.85rem; }
 .hint-text { color: var(--text-muted); font-size: 0.75rem; }
 .simple-list { margin: 0; padding-left: 18px; }
+
+
+/* Room Management Header */
+
+.room-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.room-page-header h1 {
+  margin: 0;
+}
+
+/* Primary Button */
+
+.primary-btn {
+  background: #4f63f5;
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 9px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.primary-btn:hover {
+  background: #3949d8;
+}
+
+.primary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Room Action Buttons */
+
+.room-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.room-actions button {
+  padding: 9px 20px;
+  border-radius: 8px;
+  border: 1px solid #dbe2ef;
+  background: white;
+  color: #344054;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.room-actions button:hover {
+  background: #eef2ff;
+  border-color: #4f63f5;
+  color: #4f63f5;
+}
+
+/* Delete Button */
+
+.room-actions .delete-btn {
+  background: #fff1f2;
+  color: #dc2626;
+  border: 1px solid #fecdd3;
+}
+
+.room-actions .delete-btn:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-color: #fca5a5;
+}
+
+/* Add / Edit Room Form */
+
+.room-form-card {
+  background: white;
+  border: 1px solid #e3e8f0;
+  border-radius: 14px;
+  padding: 28px;
+  margin-bottom: 28px;
+  box-shadow: 0 4px 16px rgba(20, 30, 60, 0.04);
+}
+
+.room-form-card h2 {
+  margin-top: 0;
+  margin-bottom: 24px;
+  color: #1e293b;
+}
+
+.room-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.room-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #344054;
+}
+
+.room-form input,
+.room-form select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #d6dce8;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  color: #1e293b;
+}
+
+.room-form input:focus,
+.room-form select:focus {
+  outline: none;
+  border-color: #4f63f5;
+  box-shadow: 0 0 0 3px rgba(79, 99, 245, 0.12);
+}
+
+.room-form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.room-form-actions button {
+  padding: 11px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.error-text {
+  color: #dc2626;
+  margin: 12px 0;
+}
+
+/* Responsive Layout */
+
+@media (max-width: 600px) {
+  .room-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .room-form {
+    grid-template-columns: 1fr;
+  }
+}
+
