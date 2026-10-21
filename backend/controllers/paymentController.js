@@ -1,51 +1,173 @@
+
 import Payment from "../models/Payment.js";
 import Booking from "../models/Booking.js";
 
-// @desc Create a (mock) payment for a booking
+// @desc Create a secure mock payment
 // @route POST /api/payments
+// @access Student
 export const createPayment = async (req, res) => {
   try {
     const { bookingId, amount, method } = req.body;
 
-    const booking = await Booking.findById(bookingId);
-    if (!booking) return res.status(404).json({ message: "Booking not found" });
-    if (booking.status !== "approved") {
-      return res.status(400).json({ message: "Booking must be approved before payment" });
+    // 1. Validate booking ID
+    if (!bookingId) {
+      return res.status(400).json({
+        message: "Booking ID is required",
+      });
     }
 
-    // Mock payment gateway: always succeeds, generates a fake reference
-    const transactionRef = `TXN-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+    // 2. Find booking and its room
+    const booking = await Booking.findById(bookingId)
+      .populate("room");
 
+    if (!booking) {
+      return res.status(404).json({
+        message: "Booking not found",
+      });
+    }
+
+    // 3. Verify booking ownership
+    if (
+      String(booking.student) !== String(req.user._id)
+    ) {
+      return res.status(403).json({
+        message: "You can only pay for your own bookings",
+      });
+    }
+
+    // 4. Check booking approval
+    if (booking.status !== "approved") {
+      return res.status(400).json({
+        message:
+          "Booking must be approved before payment",
+      });
+    }
+
+    // 5. Verify room and actual price
+    if (!booking.room) {
+      return res.status(400).json({
+        message: "Room information not found",
+      });
+    }
+
+    const actualAmount = Number(
+      booking.room.pricePerSemester
+    );
+
+    if (
+      !Number.isFinite(actualAmount) ||
+      actualAmount <= 0
+    ) {
+      return res.status(400).json({
+        message: "Invalid room payment amount",
+      });
+    }
+
+    // 6. Validate submitted amount
+    if (
+      amount !== undefined &&
+      amount !== null &&
+      Number(amount) !== actualAmount
+    ) {
+      return res.status(400).json({
+        message:
+          `Payment amount must be LKR ${actualAmount}`,
+      });
+    }
+
+    // 7. Prevent duplicate successful payments
+    const existingPayment = await Payment.findOne({
+      booking: bookingId,
+      status: "paid",
+    });
+
+    if (existingPayment) {
+      return res.status(409).json({
+        message: "This booking has already been paid",
+      });
+    }
+
+    // 8. Validate payment method
+    const allowedMethods = ["card"];
+
+    const paymentMethod = method || "card";
+
+    if (!allowedMethods.includes(paymentMethod)) {
+      return res.status(400).json({
+        message: "Invalid payment method",
+      });
+    }
+
+    // 9. Generate mock transaction reference
+    const transactionRef =
+      `TXN-${Date.now()}-${Math.floor(
+        Math.random() * 1000000
+      )}`;
+
+    // 10. Create payment using SERVER amount
     const payment = await Payment.create({
       student: req.user._id,
-      booking: bookingId,
-      amount,
-      method,
+      booking: booking._id,
+      amount: actualAmount,
+      method: paymentMethod,
       status: "paid",
       transactionRef,
       paidAt: new Date(),
     });
 
-    res.status(201).json(payment);
+    return res.status(201).json(payment);
+
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error("Create payment error:", error);
+
+    if (error.name === "CastError") {
+      return res.status(400).json({
+        message: "Invalid booking ID",
+      });
+    }
+
+    if (error.code === 11000) {
+      return res.status(409).json({
+        message: "A payment already exists for this booking",
+      });
+    }
+
+    return res.status(500).json({
+      message: "Unable to process payment",
+    });
   }
 };
 
-// @desc Get payments (admin sees all, student sees own)
+// @desc Get payments
 // @route GET /api/payments
+// @access Authenticated users
 export const getPayments = async (req, res) => {
   try {
-    const filter = req.user.role === "student" ? { student: req.user._id } : {};
+    // Students see only their own payments.
+    // Admins and wardens retain existing access.
+    const filter =
+      req.user.role === "student"
+        ? { student: req.user._id }
+        : {};
+
     const payments = await Payment.find(filter)
       .populate("student", "name email studentId")
       .populate({
         path: "booking",
-        populate: { path: "room", select: "roomNumber building" },
+        populate: {
+          path: "room",
+          select: "roomNumber building",
+        },
       })
       .sort({ createdAt: -1 });
-    res.json(payments);
+
+    return res.status(200).json(payments);
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Get payments error:", error);
+
+    return res.status(500).json({
+      message: "Failed to fetch payments",
+    });
   }
 };

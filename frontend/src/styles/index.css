@@ -1,6 +1,11 @@
+
+/* =========================================
+   HOSTEL MANAGEMENT SYSTEM - GLOBAL STYLES
+   ========================================= */
+
 :root {
-  --primary: #2563eb;
-  --primary-dark: #1d4ed8;
+  --primary: #4f63f5;
+  --primary-dark: #3949d8;
   --bg: #f4f6fb;
   --card-bg: #ffffff;
   --border: #e2e8f0;
@@ -9,127 +14,341 @@
   --green: #16a34a;
   --red: #dc2626;
   --orange: #ea580c;
-  --blue: #2563eb;
+  --blue: #4f63f5;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
 
 body {
   margin: 0;
+  min-width: 320px;
   font-family: "Segoe UI", Roboto, Arial, sans-serif;
   background: var(--bg);
   color: var(--text);
+  line-height: 1.5;
 }
 
-a { text-decoration: none; color: inherit; }
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+h1, h2, h3 {
+  color: var(--text);
+}
+
+h1 {
+  font-size: 2rem;
+  margin: 0 0 24px;
+}
+
+/* =========================================
+   NAVIGATION BAR
+   ========================================= */
 
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
   background: var(--card-bg);
   border-bottom: 1px solid var(--border);
   padding: 14px 28px;
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 100;
 }
 
-.navbar-brand a { font-size: 1.2rem; font-weight: 700; color: var(--primary); }
+.navbar-brand a {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--primary);
+  text-decoration: none;
+}
 
-.navbar-links { display: flex; align-items: center; gap: 18px; }
-.navbar-links a { font-weight: 500; color: var(--text-muted); }
-.navbar-links a:hover { color: var(--primary); }
-.navbar-user { font-size: 0.85rem; color: var(--text-muted); border-left: 1px solid var(--border); padding-left: 14px; }
+.navbar-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
 
-.page { max-width: 1100px; margin: 0 auto; padding: 28px 20px 60px; }
-.page-center { display: flex; align-items: center; justify-content: center; height: 60vh; }
+.navbar-links a {
+  font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.navbar-links a:hover {
+  color: var(--primary);
+}
+
+.navbar-links a.active {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.navbar-user {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  border-left: 1px solid var(--border);
+  padding-left: 14px;
+}
+
+/* =========================================
+   PAGE LAYOUT
+   ========================================= */
+
+.page {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 48px 24px 60px;
+}
+
+.page-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+/* =========================================
+   GENERAL CARDS
+   ========================================= */
 
 .card {
   background: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 18px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
 }
 
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(260px, 1fr)
+  );
+  gap: 20px;
+}
 
-.room-card-header { display: flex; justify-content: space-between; align-items: center; }
-.room-price { font-weight: 700; color: var(--primary); }
-.room-amenities { font-size: 0.85rem; color: var(--text-muted); }
+/* =========================================
+   BUTTONS
+   ========================================= */
 
 .btn {
-  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
   border-radius: 8px;
   padding: 10px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.3;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+}
+
+.btn-primary:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+.btn-outline {
+  background: white;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.btn-outline:hover {
+  background: #f8fafc;
+  border-color: var(--primary);
+}
+
+.btn-sm {
+  padding: 7px 12px;
+  font-size: 0.8rem;
+  margin-right: 6px;
+}
+
+.primary-btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 9px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  font-size: 0.9rem;
+  transition: background 0.2s ease;
 }
-.btn-primary { background: var(--primary); color: white; }
-.btn-primary:hover { background: var(--primary-dark); }
-.btn-primary:disabled { background: #94a3b8; cursor: not-allowed; }
-.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
-.btn-sm { padding: 6px 10px; font-size: 0.8rem; margin-right: 6px; }
+
+.primary-btn:hover {
+  background: var(--primary-dark);
+}
+
+.primary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =========================================
+   STATUS BADGES
+   ========================================= */
 
 .badge {
-  padding: 3px 10px;
+  display: inline-block;
+  padding: 4px 12px;
   border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: capitalize;
   background: #e2e8f0;
+  white-space: nowrap;
 }
-.badge-available, .badge-approved, .badge-paid, .badge-resolved { background: #dcfce7; color: var(--green); }
-.badge-full, .badge-rejected, .badge-failed, .badge-open { background: #fee2e2; color: var(--red); }
-.badge-pending, .badge-maintenance, .badge-in_progress { background: #ffedd5; color: var(--orange); }
-.badge-cancelled, .badge-closed, .badge-checked_out { background: #e2e8f0; color: var(--text-muted); }
 
-.auth-page { display: flex; justify-content: center; align-items: center; min-height: 85vh; padding: 20px; }
-.auth-form { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 8px; }
-.auth-form label { font-size: 0.85rem; font-weight: 600; margin-top: 6px; }
-.auth-form input, .auth-form select, .auth-form textarea {
-  padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem;
+.badge-available,
+.badge-approved,
+.badge-paid,
+.badge-resolved {
+  background: #dcfce7;
+  color: var(--green);
 }
-.auth-form button { margin-top: 14px; }
 
-.inline-form { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.inline-form input, .inline-form select, .inline-form textarea {
-  padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem;
+.badge-full,
+.badge-rejected,
+.badge-failed,
+.badge-open {
+  background: #fee2e2;
+  color: var(--red);
 }
-.inline-form textarea { width: 100%; min-height: 70px; }
 
-.filters { display: flex; gap: 12px; margin-bottom: 18px; }
-.filters select { padding: 8px; border-radius: 8px; border: 1px solid var(--border); }
+.badge-pending,
+.badge-maintenance,
+.badge-in_progress,
+.badge-in-progress {
+  background: #ffedd5;
+  color: var(--orange);
+}
 
-.table-wrap { overflow-x: auto; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); }
-table { width: 100%; border-collapse: collapse; }
-th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
-th { background: #f8fafc; font-weight: 600; }
-.actions { display: flex; gap: 6px; }
+.badge-cancelled,
+.badge-closed,
+.badge-checked_out {
+  background: #e2e8f0;
+  color: var(--text-muted);
+}
 
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
-.stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
-.stat-value { font-size: 1.8rem; font-weight: 700; }
-.stat-label { color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; }
-.stat-green .stat-value { color: var(--green); }
-.stat-red .stat-value { color: var(--red); }
-.stat-orange .stat-value { color: var(--orange); }
-.stat-blue .stat-value { color: var(--blue); }
+/* =========================================
+   ADMIN DASHBOARD
+   ========================================= */
 
-.quick-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
-.link-card { text-align: center; font-weight: 600; cursor: pointer; }
-.link-card:hover { border-color: var(--primary); }
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 28px;
+}
 
-.error-text { color: var(--red); font-size: 0.85rem; }
-.info-text { color: var(--primary); font-size: 0.85rem; }
-.hint-text { color: var(--text-muted); font-size: 0.75rem; }
-.simple-list { margin: 0; padding-left: 18px; }
+.stat-card {
+  min-width: 0;
+  min-height: 118px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
 
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
 
-/* Room Management Header */
+.stat-label {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-top: 8px;
+}
+
+.stat-green .stat-value {
+  color: var(--green);
+}
+
+.stat-red .stat-value {
+  color: var(--red);
+}
+
+.stat-orange .stat-value {
+  color: var(--orange);
+}
+
+.stat-blue .stat-value {
+  color: var(--blue);
+}
+
+/* =========================================
+   STUDENT DASHBOARD QUICK LINKS
+   ========================================= */
+
+.quick-links {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(180px, 1fr)
+  );
+  gap: 16px;
+}
+
+.link-card {
+  text-align: center;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.link-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+/* =========================================
+   ROOM MANAGEMENT
+   ========================================= */
 
 .room-page-header {
   display: flex;
@@ -143,33 +362,27 @@ th { background: #f8fafc; font-weight: 600; }
   margin: 0;
 }
 
-/* Primary Button */
-
-.primary-btn {
-  background: #4f63f5;
-  color: white;
-  border: none;
-  padding: 12px 22px;
-  border-radius: 9px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease;
+.room-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
 }
 
-.primary-btn:hover {
-  background: #3949d8;
+.room-price {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 1rem;
 }
 
-.primary-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.room-amenities {
+  font-size: 0.85rem;
+  color: var(--text-muted);
 }
-
-/* Room Action Buttons */
 
 .room-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   margin-top: 14px;
 }
@@ -188,11 +401,9 @@ th { background: #f8fafc; font-weight: 600; }
 
 .room-actions button:hover {
   background: #eef2ff;
-  border-color: #4f63f5;
-  color: #4f63f5;
+  border-color: var(--primary);
+  color: var(--primary);
 }
-
-/* Delete Button */
 
 .room-actions .delete-btn {
   background: #fff1f2;
@@ -206,7 +417,9 @@ th { background: #f8fafc; font-weight: 600; }
   border-color: #fca5a5;
 }
 
-/* Add / Edit Room Form */
+/* =========================================
+   ADD / EDIT ROOM FORM
+   ========================================= */
 
 .room-form-card {
   background: white;
@@ -220,7 +433,7 @@ th { background: #f8fafc; font-weight: 600; }
 .room-form-card h2 {
   margin-top: 0;
   margin-bottom: 24px;
-  color: #1e293b;
+  color: var(--text);
 }
 
 .room-form {
@@ -239,27 +452,29 @@ th { background: #f8fafc; font-weight: 600; }
 }
 
 .room-form input,
-.room-form select {
+.room-form select,
+.room-form textarea {
   width: 100%;
-  box-sizing: border-box;
   padding: 12px;
   border: 1px solid #d6dce8;
   border-radius: 8px;
   font-size: 14px;
   background: white;
-  color: #1e293b;
+  color: var(--text);
 }
 
 .room-form input:focus,
-.room-form select:focus {
+.room-form select:focus,
+.room-form textarea:focus {
   outline: none;
-  border-color: #4f63f5;
+  border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(79, 99, 245, 0.12);
 }
 
 .room-form-actions {
   grid-column: 1 / -1;
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   margin-top: 10px;
 }
@@ -267,24 +482,309 @@ th { background: #f8fafc; font-weight: 600; }
 .room-form-actions button {
   padding: 11px 20px;
   border-radius: 8px;
-  cursor: pointer;
 }
 
+/* =========================================
+   AUTHENTICATION
+   ========================================= */
+
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 85vh;
+  padding: 20px;
+}
+
+.auth-form {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.auth-form label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+.auth-form input,
+.auth-form select,
+.auth-form textarea {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.auth-form button {
+  margin-top: 14px;
+}
+
+/* =========================================
+   INLINE FORMS - PAYMENTS & COMPLAINTS
+   ========================================= */
+
+.inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.inline-form h3 {
+  margin: 0;
+}
+
+.inline-form input,
+.inline-form select,
+.inline-form textarea {
+  padding: 11px 13px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: white;
+  color: var(--text);
+}
+
+.inline-form textarea {
+  width: 100%;
+  min-height: 85px;
+  resize: vertical;
+}
+
+.inline-form input:focus,
+.inline-form select:focus,
+.inline-form textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79, 99, 245, 0.1);
+}
+
+/* =========================================
+   FILTERS
+   ========================================= */
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.filters select {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: white;
+}
+
+/* =========================================
+   TABLES - BOOKINGS & PAYMENTS
+   ========================================= */
+
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  background: var(--card-bg);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+th {
+  background: #f8fafc;
+  font-weight: 600;
+  color: var(--text);
+}
+
+td {
+  color: var(--text);
+}
+
+tbody tr:hover {
+  background: #fafbff;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* =========================================
+   COMPLAINT CARDS
+   ========================================= */
+
+.complaint-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+}
+
+.complaint-card h3 {
+  margin-top: 0;
+}
+
+.complaint-card p {
+  line-height: 1.6;
+}
+
+/* =========================================
+   MESSAGES & UTILITIES
+   ========================================= */
+
 .error-text {
-  color: #dc2626;
+  color: var(--red);
+  font-size: 0.85rem;
   margin: 12px 0;
 }
 
-/* Responsive Layout */
+.info-text {
+  color: var(--primary);
+  font-size: 0.85rem;
+}
 
-@media (max-width: 600px) {
-  .room-page-header {
-    flex-direction: column;
-    align-items: flex-start;
+.hint-text {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.simple-list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.simple-list li {
+  margin-bottom: 6px;
+}
+
+/* =========================================
+   RESPONSIVE DESIGN
+   ========================================= */
+
+@media (max-width: 1150px) {
+  .stats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .page {
+    padding: 32px 20px 50px;
+  }
+}
+
+@media (max-width: 800px) {
+  .navbar {
+    padding: 14px 20px;
+  }
+
+  .navbar-links {
+    gap: 12px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .room-form {
     grid-template-columns: 1fr;
   }
+
+  .page {
+    padding: 28px 16px 45px;
+  }
+
+  h1 {
+    font-size: 1.7rem;
+  }
 }
 
+@media (max-width: 600px) {
+  .navbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .navbar-links {
+    width: 100%;
+    gap: 12px;
+  }
+
+  .navbar-user {
+    border-left: none;
+    padding-left: 0;
+  }
+
+  .room-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .stats-grid {
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 16px;
+    min-height: 100px;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+  }
+
+  .card,
+  .room-form-card {
+    padding: 18px;
+  }
+
+  .inline-form {
+    align-items: stretch;
+  }
+
+  .inline-form input,
+  .inline-form select {
+    max-width: 100%;
+  }
+
+  th,
+  td {
+    padding: 12px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-links {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,33 +1,76 @@
+
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+// Authentication
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+
+// Management Pages
 import Rooms from "./pages/Rooms";
 import Bookings from "./pages/Bookings";
 import Payments from "./pages/Payments";
 import Complaints from "./pages/Complaints";
+
+// Dashboards
 import AdminDashboard from "./pages/AdminDashboard";
 import StudentDashboard from "./pages/StudentDashboard";
 
+// 404 Page
+import NotFound from "./pages/NotFound";
+
+// Redirect users to the correct dashboard
 const HomeRedirect = () => {
   const { user, loading } = useAuth();
-  if (loading) return <div className="page-center">Loading...</div>;
-  if (!user) return <Navigate to="/login" />;
-  if (user.role === "admin" || user.role === "warden") return <Navigate to="/admin" />;
-  return <Navigate to="/student" />;
+
+  if (loading) {
+    return (
+      <div className="page-center">
+        Loading...
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user.role === "admin" || user.role === "warden") {
+    return <Navigate to="/admin" replace />;
+  }
+
+  return <Navigate to="/student" replace />;
 };
 
 function App() {
   return (
     <AuthProvider>
+      {/* Navigation Sidebar */}
       <Navbar />
+
+      {/* Application Routes */}
       <Routes>
-        <Route path="/" element={<HomeRedirect />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        {/* Home */}
+        <Route
+          path="/"
+          element={<HomeRedirect />}
+        />
+
+        {/* Authentication */}
+        <Route
+          path="/login"
+          element={<Login />}
+        />
+
+        <Route
+          path="/register"
+          element={<Register />}
+        />
+
+        {/* Admin / Warden Dashboard */}
         <Route
           path="/admin"
           element={
@@ -36,6 +79,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Student Dashboard */}
         <Route
           path="/student"
           element={
@@ -44,6 +89,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Room Management */}
         <Route
           path="/rooms"
           element={
@@ -52,6 +99,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Booking Management */}
         <Route
           path="/bookings"
           element={
@@ -60,6 +109,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Payments */}
         <Route
           path="/payments"
           element={
@@ -68,6 +119,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Complaints */}
         <Route
           path="/complaints"
           element={
@@ -75,6 +128,12 @@ function App() {
               <Complaints />
             </ProtectedRoute>
           }
+        />
+
+        {/* 404 - Page Not Found */}
+        <Route
+          path="*"
+          element={<NotFound />}
         />
       </Routes>
     </AuthProvider>

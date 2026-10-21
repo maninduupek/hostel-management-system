@@ -1,0 +1,93 @@
+
+.notfound-page {
+  min-height: 85vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  background: #f5f7fc;
+}
+
+.notfound-content {
+  max-width: 500px;
+  text-align: center;
+}
+
+.notfound-icon {
+  width: 95px;
+  height: 95px;
+  margin: 0 auto 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 25px;
+  background: #eef2ff;
+  color: #6366f1;
+}
+
+.notfound-content h1 {
+  font-size: 105px;
+  line-height: 1;
+  margin: 0 0 15px;
+  color: #6366f1;
+  font-weight: 800;
+}
+
+.notfound-content h2 {
+  font-size: 27px;
+  color: #17233b;
+  margin-bottom: 15px;
+}
+
+.notfound-content p {
+  color: #64748b;
+  line-height: 1.8;
+  font-size: 15px;
+}
+
+.notfound-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+
+.notfound-home-btn,
+.notfound-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 13px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.notfound-home-btn {
+  background: #6366f1;
+  color: white;
+  border: 1px solid #6366f1;
+}
+
+.notfound-home-btn:hover {
+  background: #4f46e5;
+  color: white;
+}
+
+.notfound-back-btn {
+  background: white;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+}
+
+@media (max-width: 600px) {
+  .notfound-content h1 {
+    font-size: 75px;
+  }
+
+  .notfound-content h2 {
+    font-size: 22px;
+  }
+}

@@ -1,8 +1,26 @@
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import api from "../api/axios";
 import RoomCard from "../components/RoomCard";
 import { useAuth } from "../context/AuthContext";
+
+import {
+  BedDouble,
+  Building2,
+  CheckCircle2,
+  Wrench,
+  Plus,
+  Search,
+  SlidersHorizontal,
+  Pencil,
+  Trash2,
+  X,
+  Save,
+  RefreshCw,
+  DoorOpen,
+} from "lucide-react";
+
+import "./Rooms.css";
 
 const emptyForm = {
   roomNumber: "",
@@ -17,19 +35,6 @@ const emptyForm = {
 };
 
 const Rooms = () => {
-  const [rooms, setRooms] = useState([]);
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
-  const [filters, setFilters] = useState({
-    status: "",
-    type: "",
-  });
-
-  const [showForm, setShowForm] = useState(false);
-  const [editingRoom, setEditingRoom] = useState(null);
-  const [form, setForm] = useState(emptyForm);
-  const [saving, setSaving] = useState(false);
-
   const { user } = useAuth();
 
   const canManage =
@@ -37,27 +42,90 @@ const Rooms = () => {
 
   const isAdmin = user?.role === "admin";
 
-  const fetchRooms = async () => {
+  const [rooms, setRooms] = useState([]);
+  const [search, setSearch] = useState("");
+  const [filters, setFilters] = useState({
+    status: "",
+    type: "",
+  });
+
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  const [showForm, setShowForm] = useState(false);
+  const [editingRoom, setEditingRoom] = useState(null);
+  const [form, setForm] = useState({ ...emptyForm });
+  const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+  const [bookingId, setBookingId] = useState(null);
+
+  // Keep the existing backend filters.
+  const fetchRooms = useCallback(async (showLoader = false) => {
     try {
+      if (showLoader) setLoading(true);
+      else setRefreshing(true);
+
       const params = {};
 
       if (filters.status) params.status = filters.status;
       if (filters.type) params.type = filters.type;
 
       const { data } = await api.get("/rooms", { params });
+
       setRooms(data);
       setError("");
     } catch (err) {
       setError(
-        err.response?.data?.message || "Failed to load rooms"
+        err.response?.data?.message || "Failed to load rooms."
       );
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
     }
-  };
+  }, [filters.status, filters.type]);
 
   useEffect(() => {
-    fetchRooms();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters]);
+    fetchRooms(true);
+  }, [fetchRooms]);
+
+  // Search is applied to the rooms returned by the API.
+  const filteredRooms = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    if (!query) return rooms;
+
+    return rooms.filter((room) => {
+      const searchable = [
+        room.roomNumber,
+        room.building,
+        room.type,
+        room.status,
+        room.floor,
+        ...(room.amenities || []),
+      ]
+        .filter((value) => value != null)
+        .join(" ")
+        .toLowerCase();
+
+      return searchable.includes(query);
+    });
+  }, [rooms, search]);
+
+  // These totals describe the currently selected filters.
+  const summary = useMemo(() => ({
+    total: filteredRooms.length,
+    available: filteredRooms.filter(
+      (room) => room.status === "available"
+    ).length,
+    full: filteredRooms.filter(
+      (room) => room.status === "full"
+    ).length,
+    maintenance: filteredRooms.filter(
+      (room) => room.status === "maintenance"
+    ).length,
+  }), [filteredRooms]);
 
   const openAddForm = () => {
     setEditingRoom(null);
@@ -71,33 +139,41 @@ const Rooms = () => {
     setEditingRoom(room);
 
     setForm({
-      roomNumber: room.roomNumber,
-      building: room.building,
-      floor: room.floor,
-      type: room.type,
-      capacity: room.capacity,
-      genderRestriction: room.genderRestriction,
-      pricePerSemester: room.pricePerSemester,
+      roomNumber: room.roomNumber || "",
+      building: room.building || "",
+      floor: room.floor ?? 1,
+      type: room.type || "single",
+      capacity: room.capacity ?? 1,
+      genderRestriction: room.genderRestriction || "any",
+      pricePerSemester: room.pricePerSemester ?? "",
       amenities: room.amenities?.join(", ") || "",
-      status: room.status,
+      status: room.status || "available",
     });
 
     setShowForm(true);
     setMessage("");
     setError("");
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const closeForm = () => {
+    setShowForm(false);
+    setEditingRoom(null);
+    setForm({ ...emptyForm });
+  };
 
-    setForm((prev) => ({
-      ...prev,
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+
+    setForm((previous) => ({
+      ...previous,
       [name]: value,
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
     if (!canManage || saving) return;
 
@@ -108,6 +184,8 @@ const Rooms = () => {
     try {
       const payload = {
         ...form,
+        roomNumber: form.roomNumber.trim(),
+        building: form.building.trim(),
         floor: Number(form.floor),
         capacity: Number(form.capacity),
         pricePerSemester: Number(form.pricePerSemester),
@@ -118,8 +196,8 @@ const Rooms = () => {
       };
 
       if (
-        !payload.roomNumber.trim() ||
-        !payload.building.trim() ||
+        !payload.roomNumber ||
+        !payload.building ||
         !Number.isInteger(payload.floor) ||
         !Number.isInteger(payload.capacity) ||
         payload.capacity < 1 ||
@@ -139,13 +217,11 @@ const Rooms = () => {
         setMessage("Room added successfully!");
       }
 
-      setShowForm(false);
-      setEditingRoom(null);
-      setForm({ ...emptyForm });
+      closeForm();
       await fetchRooms();
     } catch (err) {
       setError(
-        err.response?.data?.message || "Failed to save room"
+        err.response?.data?.message || "Failed to save room."
       );
     } finally {
       setSaving(false);
@@ -153,7 +229,7 @@ const Rooms = () => {
   };
 
   const handleDelete = async (room) => {
-    if (!isAdmin) return;
+    if (!isAdmin || deletingId) return;
 
     if (room.occupants?.length > 0) {
       setError("Cannot delete a room with occupants.");
@@ -166,19 +242,29 @@ const Rooms = () => {
 
     if (!confirmed) return;
 
+    setDeletingId(room._id);
+    setError("");
+    setMessage("");
+
     try {
       await api.delete(`/rooms/${room._id}`);
-      setMessage(`Room ${room.roomNumber} deleted successfully.`);
-      setError("");
+      setMessage(
+        `Room ${room.roomNumber} deleted successfully.`
+      );
       await fetchRooms();
     } catch (err) {
       setError(
-        err.response?.data?.message || "Failed to delete room"
+        err.response?.data?.message || "Failed to delete room."
       );
+    } finally {
+      setDeletingId(null);
     }
   };
 
   const handleBook = async (room) => {
+    if (bookingId) return;
+
+    setBookingId(room._id);
     setMessage("");
     setError("");
 
@@ -196,37 +282,153 @@ const Rooms = () => {
       await fetchRooms();
     } catch (err) {
       setError(
-        err.response?.data?.message || "Booking failed"
+        err.response?.data?.message || "Booking failed."
       );
+    } finally {
+      setBookingId(null);
     }
   };
 
-  return (
-    <div className="page">
-      <div className="room-page-header">
-        <h1>Available Rooms</h1>
+  const clearFilters = () => {
+    setSearch("");
+    setFilters({ status: "", type: "" });
+  };
 
-        {canManage && (
+  return (
+    <div className="page professional-rooms">
+
+      {/* PAGE HEADER */}
+      <div className="rooms-header">
+        <div>
+          <span className="rooms-eyebrow">
+            HOSTEL MANAGEMENT
+          </span>
+
+          <h1>
+            {canManage ? "Room Management" : "Explore Rooms"}
+          </h1>
+
+          <p>
+            {canManage
+              ? "Manage accommodation, room availability and facilities."
+              : "Find suitable accommodation and request a room booking."}
+          </p>
+        </div>
+
+        <div className="rooms-header-actions">
           <button
             type="button"
-            className="primary-btn"
-            onClick={openAddForm}
+            className="rooms-refresh-btn"
+            onClick={() => fetchRooms()}
+            disabled={loading || refreshing}
           >
-            + Add Room
+            <RefreshCw size={17} />
+            {refreshing ? "Refreshing..." : "Refresh"}
           </button>
-        )}
+
+          {canManage && (
+            <button
+              type="button"
+              className="rooms-add-btn"
+              onClick={openAddForm}
+            >
+              <Plus size={19} />
+              Add Room
+            </button>
+          )}
+        </div>
       </div>
 
-      {message && <p className="info-text">{message}</p>}
-      {error && <p className="error-text">{error}</p>}
+      {/* NOTIFICATIONS */}
+      {message && (
+        <div className="rooms-alert rooms-alert-success" role="status">
+          <CheckCircle2 size={19} />
+          <span>{message}</span>
+          <button
+            type="button"
+            onClick={() => setMessage("")}
+            aria-label="Dismiss message"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
 
+      {error && (
+        <div className="rooms-alert rooms-alert-error" role="alert">
+          <span>{error}</span>
+          <button
+            type="button"
+            onClick={() => setError("")}
+            aria-label="Dismiss error"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
+      {/* SUMMARY CARDS */}
+      <div className="rooms-summary-grid">
+        <div className="rooms-summary-card">
+          <div className="rooms-summary-icon purple">
+            <Building2 size={22} />
+          </div>
+          <strong>{summary.total}</strong>
+          <span>Rooms Shown</span>
+        </div>
+
+        <div className="rooms-summary-card">
+          <div className="rooms-summary-icon green">
+            <CheckCircle2 size={22} />
+          </div>
+          <strong>{summary.available}</strong>
+          <span>Available</span>
+        </div>
+
+        <div className="rooms-summary-card">
+          <div className="rooms-summary-icon red">
+            <BedDouble size={22} />
+          </div>
+          <strong>{summary.full}</strong>
+          <span>Full Rooms</span>
+        </div>
+
+        <div className="rooms-summary-card">
+          <div className="rooms-summary-icon orange">
+            <Wrench size={22} />
+          </div>
+          <strong>{summary.maintenance}</strong>
+          <span>Maintenance</span>
+        </div>
+      </div>
+
+      {/* ADD / EDIT FORM */}
       {canManage && showForm && (
-        <div className="room-form-card">
-          <h2>
-            {editingRoom ? "Edit Room" : "Add New Room"}
-          </h2>
+        <section className="rooms-form-panel">
+          <div className="rooms-panel-heading">
+            <div>
+              <h2>
+                {editingRoom ? "Edit Room" : "Add New Room"}
+              </h2>
+              <p>
+                Enter the accommodation details below.
+              </p>
+            </div>
 
-          <form onSubmit={handleSubmit} className="room-form">
+            <button
+              type="button"
+              className="rooms-icon-btn"
+              onClick={closeForm}
+              aria-label="Close form"
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          <form
+            onSubmit={handleSubmit}
+            className="rooms-professional-form"
+          >
             <label>
               Room Number
               <input
@@ -312,16 +514,6 @@ const Rooms = () => {
             </label>
 
             <label>
-              Amenities (comma-separated)
-              <input
-                name="amenities"
-                value={form.amenities}
-                onChange={handleChange}
-                placeholder="Wi-Fi, Study Desk"
-              />
-            </label>
-
-            <label>
               Status
               <select
                 name="status"
@@ -330,18 +522,27 @@ const Rooms = () => {
               >
                 <option value="available">Available</option>
                 <option value="full">Full</option>
-                <option value="maintenance">
-                  Maintenance
-                </option>
+                <option value="maintenance">Maintenance</option>
               </select>
             </label>
 
-            <div className="room-form-actions">
+            <label className="rooms-form-wide">
+              Amenities (comma-separated)
+              <input
+                name="amenities"
+                value={form.amenities}
+                onChange={handleChange}
+                placeholder="Wi-Fi, Study Desk, Fan"
+              />
+            </label>
+
+            <div className="rooms-form-buttons">
               <button
                 type="submit"
-                className="primary-btn"
+                className="rooms-add-btn"
                 disabled={saving}
               >
+                <Save size={18} />
                 {saving
                   ? "Saving..."
                   : editingRoom
@@ -351,81 +552,161 @@ const Rooms = () => {
 
               <button
                 type="button"
-                onClick={() => setShowForm(false)}
+                className="rooms-cancel-btn"
+                onClick={closeForm}
               >
                 Cancel
               </button>
             </div>
           </form>
-        </div>
+        </section>
       )}
 
-      <div className="filters">
-        <select
-          value={filters.status}
-          onChange={(e) =>
-            setFilters({
-              ...filters,
-              status: e.target.value,
-            })
-          }
-        >
-          <option value="">All Status</option>
-          <option value="available">Available</option>
-          <option value="full">Full</option>
-          <option value="maintenance">Maintenance</option>
-        </select>
+      {/* SEARCH AND FILTERS */}
+      <section className="rooms-toolbar">
+        <div className="rooms-search">
+          <Search size={20} />
 
-        <select
-          value={filters.type}
-          onChange={(e) =>
-            setFilters({
-              ...filters,
-              type: e.target.value,
-            })
-          }
-        >
-          <option value="">All Types</option>
-          <option value="single">Single</option>
-          <option value="double">Double</option>
-          <option value="shared">Shared</option>
-        </select>
+          <input
+            type="search"
+            placeholder="Search rooms, buildings, amenities..."
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            aria-label="Search rooms"
+          />
+        </div>
+
+        <div className="rooms-filter-controls">
+          <SlidersHorizontal size={19} />
+
+          <select
+            aria-label="Filter by status"
+            value={filters.status}
+            onChange={(event) =>
+              setFilters((previous) => ({
+                ...previous,
+                status: event.target.value,
+              }))
+            }
+          >
+            <option value="">All Status</option>
+            <option value="available">Available</option>
+            <option value="full">Full</option>
+            <option value="maintenance">Maintenance</option>
+          </select>
+
+          <select
+            aria-label="Filter by room type"
+            value={filters.type}
+            onChange={(event) =>
+              setFilters((previous) => ({
+                ...previous,
+                type: event.target.value,
+              }))
+            }
+          >
+            <option value="">All Types</option>
+            <option value="single">Single</option>
+            <option value="double">Double</option>
+            <option value="shared">Shared</option>
+          </select>
+
+          <button
+            type="button"
+            className="rooms-clear-btn"
+            onClick={clearFilters}
+          >
+            Clear
+          </button>
+        </div>
+      </section>
+
+      {/* ROOM LIST HEADER */}
+      <div className="rooms-list-heading">
+        <div>
+          <h2>Room Directory</h2>
+          <p>
+            {loading
+              ? "Loading rooms..."
+              : `Showing ${filteredRooms.length} room${
+                  filteredRooms.length === 1 ? "" : "s"
+                }`}
+          </p>
+        </div>
       </div>
 
-      <div className="grid">
-        {rooms.map((room) => (
-          <div key={room._id}>
-            <RoomCard
-              room={room}
-              onBook={handleBook}
-              showBookButton={user?.role === "student"}
-            />
+      {/* ROOM CARDS */}
+      {loading ? (
+        <div className="rooms-empty-state">
+          <RefreshCw size={30} />
+          <p>Loading rooms...</p>
+        </div>
+      ) : filteredRooms.length === 0 ? (
+        <div className="rooms-empty-state">
+          <DoorOpen size={38} />
+          <h3>No Rooms Found</h3>
+          <p>
+            Try changing your search or filters.
+          </p>
+          <button
+            type="button"
+            className="rooms-cancel-btn"
+            onClick={clearFilters}
+          >
+            Clear Filters
+          </button>
+        </div>
+      ) : (
+        <div className="rooms-directory-grid">
+          {filteredRooms.map((room) => (
+            <div
+              className="rooms-directory-item"
+              key={room._id}
+            >
+              <RoomCard
+                room={room}
+                onBook={handleBook}
+                showBookButton={
+                  user?.role === "student" && !bookingId
+                }
+              />
 
-            {canManage && (
-              <div className="room-actions">
-                <button
-                  type="button"
-                  onClick={() => openEditForm(room)}
-                >
-                  Edit
-                </button>
+              {bookingId === room._id && (
+                <p className="rooms-working-text">
+                  Sending booking request...
+                </p>
+              )}
 
-                {isAdmin && (
+              {canManage && (
+                <div className="rooms-directory-actions">
                   <button
                     type="button"
-                    className="delete-btn"
-                    onClick={() => handleDelete(room)}
+                    className="rooms-edit-btn"
+                    onClick={() => openEditForm(room)}
                   >
-                    Delete
+                    <Pencil size={16} />
+                    Edit Room
                   </button>
-                )}
-              </div>
-            )}
-          </div>
-        ))}
 
-        {rooms.length === 0 && <p>No rooms found.</p>}
-      </div>
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      className="rooms-delete-btn"
+                      onClick={() => handleDelete(room)}
+                      disabled={deletingId !== null}
+                    >
+                      <Trash2 size={16} />
+                      {deletingId === room._id
+                        ? "Deleting..."
+                        : "Delete"}
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

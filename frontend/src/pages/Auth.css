@@ -1,0 +1,438 @@
+
+/* =========================================
+   HOSTEL MANAGEMENT - AUTHENTICATION
+   ========================================= */
+
+.hostel-auth-page {
+  min-height: 100vh;
+  padding: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f5fa;
+}
+
+.hostel-auth-container {
+  width: 100%;
+  max-width: 1180px;
+  min-height: 650px;
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #e5eaf2;
+  border-radius: 24px;
+  box-shadow: 0 20px 65px rgba(22, 34, 65, 0.08);
+}
+
+/* LEFT VISUAL PANEL */
+
+.hostel-auth-visual {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  padding: 38px;
+  color: white;
+  background:
+    radial-gradient(
+      circle at 95% 5%,
+      rgba(129, 140, 248, 0.3),
+      transparent 40%
+    ),
+    linear-gradient(145deg, #172554, #312e81 65%, #4338ca);
+}
+
+.hostel-auth-visual::after {
+  content: "";
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  right: -110px;
+  bottom: -110px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hostel-auth-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  width: fit-content;
+  color: white;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.hostel-auth-brand-icon {
+  width: 43px;
+  height: 43px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.hostel-auth-visual-content {
+  position: relative;
+  z-index: 1;
+  margin: 55px 0;
+}
+
+.hostel-auth-kicker {
+  display: inline-block;
+  margin-bottom: 18px;
+  color: #c7d2fe;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.hostel-auth-visual-content h1 {
+  margin: 0 0 20px;
+  font-size: clamp(36px, 4vw, 53px);
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -1.6px;
+  color: white;
+}
+
+.hostel-auth-visual-content > p {
+  max-width: 380px;
+  margin: 0;
+  color: #d6ddff;
+  font-size: 15px;
+  line-height: 1.9;
+}
+
+.hostel-auth-features {
+  display: flex;
+  flex-direction: column;
+  gap: 19px;
+  margin-top: 42px;
+}
+
+.hostel-auth-features > div {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  color: #f1f5ff;
+  font-size: 14px;
+}
+
+.hostel-auth-features svg {
+  flex-shrink: 0;
+  color: #c7d2fe;
+}
+
+.hostel-auth-visual-footer {
+  position: relative;
+  z-index: 1;
+  color: #c7d2fe;
+  font-size: 12px;
+}
+
+/* RIGHT FORM PANEL */
+
+.hostel-auth-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 50px 45px;
+}
+
+.hostel-auth-form-container {
+  width: 100%;
+  max-width: 410px;
+}
+
+.hostel-register-form-container {
+  max-width: 460px;
+}
+
+.hostel-auth-heading {
+  margin-bottom: 32px;
+}
+
+.hostel-auth-welcome {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: #6366f1;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.7px;
+}
+
+.hostel-auth-heading h2 {
+  margin: 0 0 11px;
+  color: #17233b;
+  font-size: 29px;
+  font-weight: 800;
+  letter-spacing: -0.7px;
+}
+
+.hostel-auth-heading p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.hostel-auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hostel-auth-form label {
+  display: block;
+  margin-top: 7px;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.hostel-auth-input {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 49px;
+  padding: 0 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  color: #94a3b8;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.hostel-auth-input:focus-within {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.hostel-auth-input > svg {
+  flex-shrink: 0;
+}
+
+.hostel-auth-input input {
+  width: 100%;
+  min-width: 0;
+  height: 47px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #17233b;
+  font-size: 14px;
+}
+
+.hostel-auth-input input::placeholder {
+  color: #94a3b8;
+}
+
+.hostel-auth-eye {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+.hostel-auth-eye:hover {
+  color: #6366f1;
+}
+
+.hostel-auth-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 49px;
+  margin-top: 14px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 10px;
+  background: #6366f1;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.hostel-auth-submit:hover:not(:disabled) {
+  background: #4f46e5;
+  transform: translateY(-1px);
+}
+
+.hostel-auth-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.hostel-auth-switch {
+  margin: 26px 0 0;
+  color: #64748b;
+  font-size: 13px;
+  text-align: center;
+}
+
+.hostel-auth-switch a {
+  color: #6366f1;
+  font-weight: 700;
+}
+
+.hostel-auth-switch a:hover {
+  text-decoration: underline;
+}
+
+.hostel-auth-error {
+  padding: 13px 15px;
+  margin-bottom: 20px;
+  border: 1px solid #fecaca;
+  border-radius: 9px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 13px;
+}
+
+.hostel-auth-demo {
+  margin-top: 34px;
+  padding: 16px 18px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 11px;
+}
+
+.hostel-auth-demo strong {
+  color: #334155;
+  font-size: 13px;
+}
+
+.hostel-auth-demo p {
+  margin: 7px 0 0;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* REGISTRATION */
+
+.hostel-register-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.hostel-auth-field {
+  min-width: 0;
+}
+
+.hostel-auth-field label {
+  margin: 0 0 9px;
+}
+
+.hostel-auth-full {
+  grid-column: 1 / -1;
+}
+
+.hostel-auth-select {
+  width: 100%;
+  height: 49px;
+  padding: 0 13px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #17233b;
+  font-size: 14px;
+}
+
+.hostel-auth-select:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.hostel-register-grid .hostel-auth-submit {
+  margin-top: 8px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 950px) {
+  .hostel-auth-container {
+    grid-template-columns: 1fr;
+    max-width: 650px;
+  }
+
+  .hostel-auth-visual {
+    padding: 28px;
+  }
+
+  .hostel-auth-visual-content {
+    margin: 32px 0;
+  }
+
+  .hostel-auth-visual-content h1 {
+    font-size: 34px;
+  }
+
+  .hostel-auth-features,
+  .hostel-auth-visual-footer {
+    display: none;
+  }
+
+  .hostel-auth-main {
+    padding: 40px 30px;
+  }
+}
+
+@media (max-width: 550px) {
+  .hostel-auth-page {
+    padding: 12px;
+  }
+
+  .hostel-auth-container {
+    border-radius: 16px;
+  }
+
+  .hostel-auth-visual {
+    padding: 24px;
+  }
+
+  .hostel-auth-visual-content h1 {
+    font-size: 30px;
+  }
+
+  .hostel-auth-main {
+    padding: 30px 20px;
+  }
+
+  .hostel-auth-heading h2 {
+    font-size: 25px;
+  }
+
+  .hostel-register-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hostel-auth-full {
+    grid-column: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hostel-auth-submit,
+  .hostel-auth-input {
+    transition: none;
+  }
+}
