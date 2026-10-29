@@ -1,11 +1,10 @@
 
-/* ========================================
-   PROFESSIONAL STUDENT DASHBOARD
-   ======================================== */
+/* STUDENT DASHBOARD */
 
 .student-dashboard {
   max-width: 1500px;
-  padding-top: 35px;
+  padding-top: 30px;
+  padding-bottom: 40px;
 }
 
 /* HEADER */
@@ -38,11 +37,13 @@
   margin: 0;
   color: #64748b;
   font-size: 14px;
+  line-height: 1.6;
 }
 
 .student-dashboard-refresh {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 9px;
   padding: 11px 18px;
   border: 1px solid #e2e8f0;
@@ -54,17 +55,23 @@
   cursor: pointer;
 }
 
+.student-dashboard-refresh:hover {
+  background: #f8fafc;
+}
+
 .student-dashboard-refresh:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.student-dashboard-alert {
+/* ERROR */
+
+.student-dashboard-error {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 20px;
   padding: 14px 18px;
+  margin-bottom: 20px;
   background: #fef2f2;
   border: 1px solid #fecaca;
   border-radius: 10px;
@@ -72,7 +79,7 @@
   font-size: 13px;
 }
 
-/* STATS */
+/* STATISTICS */
 
 .student-stats-grid {
   display: grid;
@@ -84,7 +91,7 @@
 .student-stat-card {
   min-width: 0;
   padding: 22px;
-  background: white;
+  background: #ffffff;
   border: 1px solid #e5eaf2;
   border-radius: 16px;
   box-shadow: 0 3px 12px rgba(20, 30, 60, 0.03);
@@ -126,9 +133,9 @@
 
 .student-stat-card strong {
   display: block;
+  color: #17233b;
   font-size: 28px;
   font-weight: 800;
-  color: #17233b;
   overflow-wrap: anywhere;
 }
 
@@ -139,18 +146,18 @@
 .student-stat-card > span {
   display: block;
   margin-top: 7px;
-  font-size: 14px;
   color: #64748b;
+  font-size: 14px;
 }
 
 .student-stat-card small {
   display: block;
   margin-top: 9px;
-  font-size: 12px;
   color: #94a3b8;
+  font-size: 12px;
 }
 
-/* MAIN LAYOUT */
+/* MAIN GRID */
 
 .student-main-grid {
   display: grid;
@@ -166,12 +173,15 @@
   margin-bottom: 25px;
 }
 
+/* PANELS */
+
 .student-panel {
   min-width: 0;
   padding: 24px;
-  background: white;
+  background: #ffffff;
   border: 1px solid #e5eaf2;
   border-radius: 16px;
+  box-shadow: 0 3px 12px rgba(20, 30, 60, 0.02);
 }
 
 .student-panel-heading {
@@ -188,6 +198,7 @@
   gap: 9px;
   margin: 0 0 7px;
   font-size: 18px;
+  font-weight: 700;
   color: #17233b;
 }
 
@@ -209,6 +220,11 @@
   font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
+  text-decoration: none;
+}
+
+.student-text-link:hover {
+  color: #4f46e5;
 }
 
 /* ACCOMMODATION */
@@ -218,9 +234,9 @@
   align-items: center;
   gap: 18px;
   padding: 22px;
+  background: #f5f6ff;
   border: 1px solid #e0e7ff;
   border-radius: 13px;
-  background: #f5f6ff;
 }
 
 .student-room-icon {
@@ -235,25 +251,25 @@
   color: #6366f1;
 }
 
-.student-room-highlight > div:nth-child(2) {
+.student-room-info {
   flex: 1;
   min-width: 0;
 }
 
-.student-room-highlight > div:nth-child(2) > span {
+.student-room-info > span {
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 1px;
   color: #6366f1;
 }
 
-.student-room-highlight h3 {
+.student-room-info h3 {
   margin: 6px 0;
-  font-size: 23px;
   color: #17233b;
+  font-size: 23px;
 }
 
-.student-room-highlight p {
+.student-room-info p {
   margin: 0;
   color: #64748b;
   font-size: 13px;
@@ -291,11 +307,12 @@
   justify-content: center;
   gap: 10px;
   padding: 12px 17px;
-  border-radius: 9px;
   background: #6366f1;
-  color: white;
+  border-radius: 9px;
+  color: #ffffff;
   font-size: 13px;
   font-weight: 700;
+  text-decoration: none;
 }
 
 .student-primary-link:hover {
@@ -308,11 +325,13 @@
   align-items: center;
   gap: 10px;
   padding: 13px 15px;
-  border-radius: 9px;
   background: #fff7ed;
+  border-radius: 9px;
   color: #c2410c;
   font-size: 13px;
 }
+
+/* EMPTY ACCOMMODATION */
 
 .student-no-booking {
   display: flex;
@@ -338,6 +357,7 @@
 .student-no-booking h3 {
   margin: 0;
   color: #17233b;
+  font-size: 19px;
 }
 
 .student-no-booking p {
@@ -363,6 +383,7 @@
   padding: 13px;
   border: 1px solid #e5eaf2;
   border-radius: 11px;
+  text-decoration: none;
   transition: border-color 0.2s, background 0.2s;
 }
 
@@ -403,7 +424,7 @@
   color: #94a3b8;
 }
 
-/* ACTIVITY */
+/* RECENT ACTIVITY */
 
 .student-activity-list {
   display: flex;
@@ -453,14 +474,16 @@
   font-size: 11px;
 }
 
+/* STATUS BADGES */
+
 .student-status {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   padding: 7px 10px;
-  border-radius: 999px;
   background: #f1f5f9;
+  border-radius: 999px;
   color: #64748b;
   font-size: 11px;
   font-weight: 700;
@@ -499,7 +522,7 @@
   font-size: 13px;
 }
 
-/* RESPONSIVE */
+/* RESPONSIVE DESIGN */
 
 @media (max-width: 1150px) {
   .student-stats-grid {
@@ -528,6 +551,10 @@
 
   .student-panel {
     padding: 18px;
+  }
+
+  .student-panel-heading {
+    flex-wrap: wrap;
   }
 
   .student-room-highlight {

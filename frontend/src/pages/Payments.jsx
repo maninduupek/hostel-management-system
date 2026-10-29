@@ -16,6 +16,8 @@ import {
   AlertCircle,
   TrendingUp,
   BedDouble,
+  LockKeyhole,
+  ArrowLeft,
 } from "lucide-react";
 
 import {
@@ -41,7 +43,6 @@ const money = (value) =>
 
 const formatDate = (value) => {
   if (!value) return "-";
-
   const date = new Date(value);
 
   return Number.isNaN(date.getTime())
@@ -52,6 +53,11 @@ const formatDate = (value) => {
         year: "numeric",
       });
 };
+
+// DEMO ONLY. Never use actual payment card details.
+const TEST_CARD = "4242424242424242";
+const TEST_EXPIRY = "12/28";
+const TEST_CVV = "123";
 
 const Payments = () => {
   const { user } = useAuth();
@@ -66,12 +72,26 @@ const Payments = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [paying, setPaying] = useState(false);
+  const [showCardForm, setShowCardForm] = useState(false);
+
+  const [cardholder, setCardholder] = useState("");
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiry, setExpiry] = useState("");
+  const [cvv, setCvv] = useState("");
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+
+  const resetCard = () => {
+    setCardholder("");
+    setCardNumber("");
+    setExpiry("");
+    setCvv("");
+    setShowCardForm(false);
+  };
 
   const fetchData = useCallback(
     async (initial = false) => {
@@ -83,7 +103,6 @@ const Payments = () => {
 
         if (isStaff) {
           const { data } = await paymentRequest;
-
           if (!Array.isArray(data)) {
             throw new Error("Invalid payment response");
           }
@@ -156,19 +175,22 @@ const Payments = () => {
     (booking) => !alreadyPaidBookingIds.has(booking._id)
   );
 
-  const handlePay = async (event) => {
+  const price = Number(
+    selectedRoomBooking?.room?.pricePerSemester || 0
+  );
+
+  const handleContinue = (event) => {
     event.preventDefault();
+    setError("");
+    setMessage("");
 
-    if (!selectedRoomBooking || paying) return;
-
-    const price = Number(
-      selectedRoomBooking.room?.pricePerSemester
-    );
+    if (!selectedRoomBooking) {
+      setError("Please select an approved booking.");
+      return;
+    }
 
     if (!Number.isFinite(price) || price <= 0) {
-      setError(
-        "This booking does not have a valid room price."
-      );
+      setError("This booking does not have a valid room price.");
       return;
     }
 
@@ -177,32 +199,82 @@ const Payments = () => {
       return;
     }
 
-    const confirmed = window.confirm(
-      `Confirm mock payment of ${money(price)} for room ${
-        selectedRoomBooking.room?.roomNumber || ""
-      }?`
-    );
+    resetCard();
+    setShowCardForm(true);
+  };
 
-    if (!confirmed) return;
+  const handleCardNumber = (value) => {
+    const digits = value.replace(/\D/g, "").slice(0, 16);
+    setCardNumber(digits.replace(/(.{4})/g, "$1 ").trim());
+  };
+
+  const handleExpiry = (value) => {
+    const digits = value.replace(/\D/g, "").slice(0, 4);
+
+    setExpiry(
+      digits.length > 2
+        ? `${digits.slice(0, 2)}/${digits.slice(2)}`
+        : digits
+    );
+  };
+
+  const handlePay = async (event) => {
+    event.preventDefault();
+
+    if (!selectedRoomBooking || paying) return;
+
+    if (!cardholder.trim()) {
+      setError("Please enter a cardholder name.");
+      return;
+    }
+
+    const enteredCard = cardNumber.replace(/\s/g, "");
+
+    if (
+      enteredCard !== TEST_CARD ||
+      expiry !== TEST_EXPIRY ||
+      cvv !== TEST_CVV
+    ) {
+      setError(
+        "Invalid demo card details. Use the test card information shown below."
+      );
+      return;
+    }
+
+    if (!Number.isFinite(price) || price <= 0) {
+      setError("Invalid booking amount.");
+      return;
+    }
+
+    if (alreadyPaidBookingIds.has(selectedBooking)) {
+      setError("This booking has already been paid.");
+      return;
+    }
 
     setPaying(true);
     setMessage("");
     setError("");
 
     try {
+      // Never send card number, expiry or CVV to backend.
       await api.post("/payments", {
         bookingId: selectedBooking,
         amount: price,
         method: "card",
       });
 
+      resetCard();
       setSelectedBooking("");
+
       await fetchData();
 
-      setMessage("Mock payment recorded successfully!");
+      setMessage(
+        "Demo card payment recorded successfully! No real money was charged."
+      );
     } catch (err) {
       setError(
-        err.response?.data?.message || "Payment failed."
+        err.response?.data?.message ||
+          "Payment failed. Please try again."
       );
     } finally {
       setPaying(false);
@@ -247,10 +319,7 @@ const Payments = () => {
         .join(" ")
         .toLowerCase();
 
-      return (
-        matchesStatus &&
-        (!query || text.includes(query))
-      );
+      return matchesStatus && (!query || text.includes(query));
     });
   }, [payments, search, statusFilter]);
 
@@ -262,13 +331,10 @@ const Payments = () => {
       counts[status] = (counts[status] || 0) + 1;
     });
 
-    return Object.entries(counts).map(
-      ([name, value]) => ({
-        name:
-          name.charAt(0).toUpperCase() + name.slice(1),
-        value,
-      })
-    );
+    return Object.entries(counts).map(([name, value]) => ({
+      name: name.charAt(0).toUpperCase() + name.slice(1),
+      value,
+    }));
   }, [payments]);
 
   const monthlyChart = useMemo(() => {
@@ -288,8 +354,7 @@ const Payments = () => {
         ).padStart(2, "0")}`;
 
         totals[key] =
-          (totals[key] || 0) +
-          Number(payment.amount || 0);
+          (totals[key] || 0) + Number(payment.amount || 0);
       });
 
     return Object.keys(totals)
@@ -313,17 +378,13 @@ const Payments = () => {
           <span className="payments-eyebrow">
             HOSTEL MANAGEMENT
           </span>
-
           <h1>
-            {isStaff
-              ? "Payment Management"
-              : "My Payments"}
+            {isStaff ? "Payment Management" : "My Payments"}
           </h1>
-
           <p>
             {isStaff
               ? "Monitor hostel payments, transactions and revenue."
-              : "View your payment history and manage accommodation fees."}
+              : "View payment history and manage accommodation fees."}
           </p>
         </div>
 
@@ -410,7 +471,7 @@ const Payments = () => {
         </div>
       </div>
 
-      {/* STUDENT PAYMENT FORM */}
+      {/* STUDENT PAYMENT */}
       {!isStaff && (
         <section className="payments-form-panel">
           <div className="payments-section-heading">
@@ -420,8 +481,8 @@ const Payments = () => {
                 Make a Payment
               </h2>
               <p>
-                Select an approved booking to record a
-                mock accommodation payment.
+                Pay your hostel accommodation fee using
+                the demo card checkout.
               </p>
             </div>
 
@@ -437,12 +498,13 @@ const Payments = () => {
               <BedDouble size={24} />
               <p>
                 No unpaid approved bookings are available.
+                Create a booking and get admin approval first.
               </p>
             </div>
-          ) : (
+          ) : !showCardForm ? (
             <form
               className="payments-form"
-              onSubmit={handlePay}
+              onSubmit={handleContinue}
             >
               <label>
                 Approved Booking
@@ -478,10 +540,7 @@ const Payments = () => {
                   type="text"
                   value={
                     selectedRoomBooking
-                      ? money(
-                          selectedRoomBooking.room
-                            ?.pricePerSemester
-                        )
+                      ? money(price)
                       : ""
                   }
                   placeholder="Select a booking first"
@@ -492,19 +551,174 @@ const Payments = () => {
               <button
                 type="submit"
                 className="payments-pay-btn"
-                disabled={!selectedBooking || paying}
+                disabled={!selectedBooking}
               >
                 <CreditCard size={18} />
-                {paying
-                  ? "Processing..."
-                  : "Pay Now (Mock)"}
+                Continue to Card Payment
               </button>
             </form>
+          ) : (
+            <div className="payments-card-checkout">
+              <button
+                type="button"
+                className="payments-card-cancel"
+                onClick={resetCard}
+                disabled={paying}
+              >
+                <ArrowLeft size={15} />
+                Back to Booking
+              </button>
+
+              <h3>Card Payment</h3>
+              <p>
+                Complete your accommodation payment
+                using demo card information.
+              </p>
+
+              {/* CARD PREVIEW */}
+              <div className="payments-card-preview">
+                <div className="payments-card-preview-header">
+                  <span className="payments-card-brand">
+                    HOSTEL MS
+                  </span>
+                  <CreditCard size={28} />
+                </div>
+
+                <div className="payments-card-preview-number">
+                  {cardNumber || "•••• •••• •••• ••••"}
+                </div>
+
+                <div className="payments-card-preview-footer">
+                  <div>
+                    <span>CARDHOLDER</span>
+                    <strong>
+                      {cardholder || "STUDENT NAME"}
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>EXPIRES</span>
+                    <strong>{expiry || "MM/YY"}</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* CARD FORM */}
+              <form
+                className="payments-card-form"
+                onSubmit={handlePay}
+                autoComplete="off"
+              >
+                <label>
+                  Cardholder Name
+                  <input
+                    type="text"
+                    placeholder="Test Student"
+                    value={cardholder}
+                    onChange={(event) =>
+                      setCardholder(event.target.value)
+                    }
+                    maxLength={60}
+                    autoComplete="off"
+                    required
+                  />
+                </label>
+
+                <label>
+                  Card Number
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="4242 4242 4242 4242"
+                    value={cardNumber}
+                    onChange={(event) =>
+                      handleCardNumber(event.target.value)
+                    }
+                    maxLength={19}
+                    autoComplete="off"
+                    required
+                  />
+                </label>
+
+                <div className="payments-card-form-row">
+                  <label>
+                    Expiry Date
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="MM/YY"
+                      value={expiry}
+                      onChange={(event) =>
+                        handleExpiry(event.target.value)
+                      }
+                      maxLength={5}
+                      autoComplete="off"
+                      required
+                    />
+                  </label>
+
+                  <label>
+                    CVV (Demo Only)
+                    <input
+                      type="password"
+                      inputMode="numeric"
+                      placeholder="123"
+                      value={cvv}
+                      onChange={(event) =>
+                        setCvv(
+                          event.target.value
+                            .replace(/\D/g, "")
+                            .slice(0, 3)
+                        )
+                      }
+                      maxLength={3}
+                      autoComplete="off"
+                      required
+                    />
+                  </label>
+                </div>
+
+                <div className="payments-card-amount">
+                  <span>Total Amount</span>
+                  <strong>{money(price)}</strong>
+                </div>
+
+                <div className="payments-card-demo-notice">
+                  <LockKeyhole size={18} />
+                  <div>
+                    <strong>Demo checkout only</strong>
+                    <p>
+                      Use only the test details below.
+                      Never enter your actual card details.
+                      No real money will be charged.
+                    </p>
+                    <p>
+                      Test Card: 4242 4242 4242 4242
+                      <br />
+                      Expiry: 12/28
+                      <br />
+                      CVV: 123
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="payments-card-submit"
+                  disabled={paying}
+                >
+                  <LockKeyhole size={18} />
+                  {paying
+                    ? "Processing Demo Payment..."
+                    : `Pay ${money(price)} (Demo)`}
+                </button>
+              </form>
+            </div>
           )}
 
           <p className="payments-demo-note">
-            This is a demonstration payment system.
-            No real money is charged.
+            Demonstration payment system only.
+            No real card is processed and no real money is charged.
           </p>
         </section>
       )}
@@ -617,7 +831,6 @@ const Payments = () => {
       <div className="payments-toolbar">
         <div className="payments-search">
           <Search size={19} />
-
           <input
             type="search"
             value={search}
@@ -657,7 +870,7 @@ const Payments = () => {
         </div>
       </div>
 
-      {/* HISTORY */}
+      {/* PAYMENT HISTORY */}
       <section className="payments-table-panel">
         <div className="payments-table-header">
           <div>
@@ -743,8 +956,7 @@ const Payments = () => {
 
                     <td>
                       {formatDate(
-                        payment.paidAt ||
-                          payment.createdAt
+                        payment.paidAt || payment.createdAt
                       )}
                     </td>
                   </tr>
