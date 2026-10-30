@@ -67,9 +67,9 @@ const Login = () => {
             </span>
 
             <h1>
-              Your hostel,
+              Your campus,
               <br />
-              simplified.
+              your space.
             </h1>
 
             <p>

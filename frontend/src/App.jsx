@@ -1,5 +1,6 @@
 
-import { Routes, Route, Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
 import Navbar from "./components/Navbar";
@@ -45,11 +46,44 @@ const HomeRedirect = () => {
   return <Navigate to="/student" replace />;
 };
 
+const ScrollRevealObserver = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    const targets = document.querySelectorAll(
+      ".page > *, .page section, .page .card, .page .dashboard-stat-card, .page .student-stat-card, .portal-page > *, .portal-page section, .portal-page .portal-stat-card, .portal-page .portal-showcase-card, .portal-page .admin-action-card"
+    );
+
+    if (!targets.length) return undefined;
+
+    targets.forEach((element) => element.classList.add("reveal-ready"));
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.08, rootMargin: "0px 0px -6%" }
+    );
+
+    targets.forEach((element) => observer.observe(element));
+
+    return () => observer.disconnect();
+  }, [location.pathname]);
+
+  return null;
+};
+
 function App() {
   return (
     <AuthProvider>
       {/* Navigation Sidebar */}
       <Navbar />
+      <ScrollRevealObserver />
 
       {/* Application Routes */}
       <Routes>
